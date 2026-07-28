@@ -14,11 +14,11 @@ seasonStats1 = playercareerstats.PlayerCareerStats(id1).get_data_frames()[0]
 seasonStats2 = playercareerstats.PlayerCareerStats(id2).get_data_frames()[0]
 
 
-'''with open (filepath1, 'w') as stats1:
+with open (filepath1, 'w') as stats1:
     stats1.write(seasonStats1.to_json(orient='records', lines=True))
 
 with open (filepath2, 'w') as stats2:
-    stats2.write(seasonStats2.to_json(orient='records', lines=True))'''
+    stats2.write(seasonStats2.to_json(orient='records', lines=True))
 
 #check for season 2025-26
 for i in seasonStats1.index:
@@ -34,7 +34,3 @@ for i in seasonStats2.index:
         print(seasonStats2.loc[i])
     else:
         pass
-    
-
-#print(seasonStats1.loc[0, 'SEASON_ID'])
-#print(seasonStats2)
