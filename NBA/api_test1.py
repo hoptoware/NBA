@@ -4,11 +4,17 @@ import pandas as pd
 from functions import player
 
 from nba_api.stats.static import players, teams
-from nba_api.stats.endpoints import playercareerstats, playercompare
+from nba_api.stats.endpoints import playercareerstats
+
+
+whitespace = " "
 
 
 filepath1 = r"python\NBA\stats\AE_Stats.json"
 filepath2 = r"python\NBA\stats\NJ_Stats.json"
+
+
+##########
 
 
 #define players
@@ -46,3 +52,26 @@ for i in seasonStats2.index:
                     gp=float(seasonStats2.loc[i, 'GP']))
     else:
         pass
+
+
+#TODO: add a function to compare the two players and print out the results in a nice format
+print("2025-26 STATS")
+print("Anthony Edwards vs. Nikola Jokic: (Arrow points the category winner)")
+
+
+#points result
+resultPTS = '??'
+resultREB = '??'
+resultAST = '??'
+resultBLK = '??'
+resultSTL = '??'
+resultTOV = '??'
+
+if player.compare(AE, NJ)[0]['pts'] == AE:
+    result = '<='
+elif player.compare(AE, NJ)[0]['pts'] == NJ:
+    result = '=>'
+else:
+    result = '=='
+
+print(f"----------POINTS----------\n AE: {AE.ptsAvg} {result} {NJ.ptsAvg} :NJ")
