@@ -55,23 +55,23 @@ for i in seasonStats2.index:
 
 
 #TODO: add a function to compare the two players and print out the results in a nice format
+comparison = player.compare(AE, NJ)
+
 print("2025-26 STATS")
 print("Anthony Edwards vs. Nikola Jokic: (Arrow points the category winner)")
 
 
 #points result
-resultPTS = '??'
-resultREB = '??'
-resultAST = '??'
-resultBLK = '??'
-resultSTL = '??'
-resultTOV = '??'
+print(f"----------POINTS----------\n AE: {AE.ptsAvg} {comparison[0]['pts']} {NJ.ptsAvg} :NJ")
+print(f"----------REBOUNDS----------\n AE: {AE.rebAvg} {comparison[0]['reb']} {NJ.rebAvg} :NJ")
+print(f"----------ASSISTS----------\n AE: {AE.astAvg} {comparison[0]['ast']} {NJ.astAvg} :NJ")
+print(f"----------BLOCKS----------\n AE: {AE.blkAvg} {comparison[0]['blk']} {NJ.blkAvg} :NJ")
+print(f"----------STEALS----------\n AE: {AE.stlAvg} {comparison[0]['stl']} {NJ.stlAvg} :NJ")
+print(f"----------TURNOVERS----------\n AE: {AE.tovAvg} {comparison[0]['tov']} {NJ.tovAvg} :NJ")
 
-if player.compare(AE, NJ)[0]['pts'] == AE:
-    result = '<='
-elif player.compare(AE, NJ)[0]['pts'] == NJ:
-    result = '=>'
+if comparison[1] > comparison[2]:
+    print("\nOVERALL WINNER: ANTHONY EDWARDS")
+elif comparison[1] < comparison[2]:
+    print("\nOVERALL WINNER: NIKOLA JOKIC")
 else:
-    result = '=='
-
-print(f"----------POINTS----------\n AE: {AE.ptsAvg} {result} {NJ.ptsAvg} :NJ")
+    print("\nTIE")
