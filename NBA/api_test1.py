@@ -54,7 +54,6 @@ for i in seasonStats2.index:
         pass
 
 
-#TODO: add a function to compare the two players and print out the results in a nice format
 comparison = player.compare(AE, NJ)
 
 print("2025-26 STATS")
@@ -75,3 +74,5 @@ elif comparison[1] < comparison[2]:
     print("\nOVERALL WINNER: NIKOLA JOKIC")
 else:
     print("\nTIE")
+
+#TODO: make it so that the user can input the names of the players they want to compare, and the program will automatically fetch their stats and compare them.
