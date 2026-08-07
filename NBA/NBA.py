@@ -33,12 +33,25 @@ seasonStats1 = playercareerstats.PlayerCareerStats(id1).get_data_frames()[0]
 seasonStats2 = playercareerstats.PlayerCareerStats(id2).get_data_frames()[0]
 
 #save stats as json files
-#TODO: check if file already exists, and if so, save it with another name
-with open (filepath1, 'w') as stats1:
-    stats1.write(seasonStats1.to_json(orient='records', lines=True))
+try:
+    with open (filepath1, 'r') as stats1:
+        pass #check for file
+    filepath1 = fr"NBA\stats\{player1['initials']}_Stats1.json"
+    with open (filepath1, 'w') as stats1:
+        stats1.write(seasonStats1.to_json(orient='records', lines=True)) #if exists, write with another name
+except: #if doesn't exist
+    with open (filepath1, 'w') as stats1:
+        stats1.write(seasonStats1.to_json(orient='records', lines=True)) #save it with default name
 
-with open (filepath2, 'w') as stats2:
-    stats2.write(seasonStats2.to_json(orient='records', lines=True))
+try:
+    with open (filepath2, 'r') as stats2:
+        pass #check for file
+    filepath2 = fr"NBA\stats\{player2['initials']}_Stats1.json"
+    with open (filepath2, 'w') as stats2:
+        stats2.write(seasonStats2.to_json(orient='records', lines=True)) #if exists, write with another name
+except: #if doesn't exist
+    with open (filepath2, 'w') as stats2:
+        stats2.write(seasonStats2.to_json(orient='records', lines=True)) #save it with default name
 
 #check for season 2025-26 and print the stats for that season
 for i in seasonStats1.index:
@@ -70,12 +83,12 @@ print(f"{name1} vs. {name2}: (Arrow points the category winner)")
 
 #points result
 #TODO: centralize the text
-print(f"----------POINTS----------\n {player1['id']}: {P1.ptsAvg} {comparison[0]['pts']} {P2.ptsAvg} :{player2['initials']}")
-print(f"----------REBOUNDS----------\n {player1['id']}: {P1.rebAvg} {comparison[0]['reb']} {P2.rebAvg} :{player2['initials']}")
-print(f"----------ASSISTS----------\n {player1['id']}: {P1.astAvg} {comparison[0]['ast']} {P2.astAvg} :{player2['initials']}")
-print(f"----------BLOCKS----------\n {player1['id']}: {P1.blkAvg} {comparison[0]['blk']} {P2.blkAvg} :{player2['initials']}")
-print(f"----------STEALS----------\n {player1['id']}: {P1.stlAvg} {comparison[0]['stl']} {P2.stlAvg} :{player2['initials']}")
-print(f"----------TURNOVERS----------\n {player1['id']}: {P1.tovAvg} {comparison[0]['tov']} {P2.tovAvg} :{player2['initials']}")
+print(f"----------POINTS----------\n {player1['initials']}: {P1.ptsAvg} {comparison[0]['pts']} {P2.ptsAvg} :{player2['initials']}")
+print(f"----------REBOUNDS----------\n {player1['initials']}: {P1.rebAvg} {comparison[0]['reb']} {P2.rebAvg} :{player2['initials']}")
+print(f"----------ASSISTS----------\n {player1['initials']}: {P1.astAvg} {comparison[0]['ast']} {P2.astAvg} :{player2['initials']}")
+print(f"----------BLOCKS----------\n {player1['initials']}: {P1.blkAvg} {comparison[0]['blk']} {P2.blkAvg} :{player2['initials']}")
+print(f"----------STEALS----------\n {player1['initials']}: {P1.stlAvg} {comparison[0]['stl']} {P2.stlAvg} :{player2['initials']}")
+print(f"----------TURNOVERS----------\n {player1['initials']}: {P1.tovAvg} {comparison[0]['tov']} {P2.tovAvg} :{player2['initials']}")
 
 if comparison[1] > comparison[2]:
     print(f"\nOVERALL WINNER: {P1.name}")
