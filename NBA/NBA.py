@@ -60,8 +60,9 @@ for i in seasonStats1.index:
                     pts=float(seasonStats1.loc[i, 'PTS']), reb=float(seasonStats1.loc[i, 'REB']), ast=float(seasonStats1.loc[i, 'AST']), 
                     blk=float(seasonStats1.loc[i, 'BLK']), stl=float(seasonStats1.loc[i, 'STL']), tov=float(seasonStats1.loc[i, 'TOV']),
                     gp=float(seasonStats1.loc[i, 'GP']))
+        break
     else:
-        pass
+        P1 = None
 
 print("\n")
 
@@ -71,28 +72,32 @@ for i in seasonStats2.index:
                     pts=float(seasonStats2.loc[i, 'PTS']), reb=float(seasonStats2.loc[i, 'REB']), ast=float(seasonStats2.loc[i, 'AST']), 
                     blk=float(seasonStats2.loc[i, 'BLK']), stl=float(seasonStats2.loc[i, 'STL']), tov=float(seasonStats2.loc[i, 'TOV']),
                     gp=float(seasonStats2.loc[i, 'GP']))
+        break
     else:
-        pass
+        P2 = None
 
 #TODO: add an exception in case the player doesn't have stats in 2025-26 season
-comparison = player.compare(P1, P2)
-
-print("2025-26 STATS")
-print(f"{name1} vs. {name2}: (Arrow points the category winner)")
-
-
-#points result
-#TODO: centralize the text
-print(f"----------POINTS----------\n {player1['initials']}: {P1.ptsAvg} {comparison[0]['pts']} {P2.ptsAvg} :{player2['initials']}")
-print(f"----------REBOUNDS----------\n {player1['initials']}: {P1.rebAvg} {comparison[0]['reb']} {P2.rebAvg} :{player2['initials']}")
-print(f"----------ASSISTS----------\n {player1['initials']}: {P1.astAvg} {comparison[0]['ast']} {P2.astAvg} :{player2['initials']}")
-print(f"----------BLOCKS----------\n {player1['initials']}: {P1.blkAvg} {comparison[0]['blk']} {P2.blkAvg} :{player2['initials']}")
-print(f"----------STEALS----------\n {player1['initials']}: {P1.stlAvg} {comparison[0]['stl']} {P2.stlAvg} :{player2['initials']}")
-print(f"----------TURNOVERS----------\n {player1['initials']}: {P1.tovAvg} {comparison[0]['tov']} {P2.tovAvg} :{player2['initials']}")
-
-if comparison[1] > comparison[2]:
-    print(f"\nOVERALL WINNER: {P1.name}")
-elif comparison[1] < comparison[2]:
-    print(f"\nOVERALL WINNER: {P2.name}")
+if P1 == None or P2 == None:
+    print("At least one player hasn't played in the 2025-26 season. The comparison cannot be made.")
 else:
-    print("\nTIE")
+    comparison = player.compare(P1, P2)
+
+    print("2025-26 STATS")
+    print(f"{name1} vs. {name2}: (Arrow points the category winner)")
+
+
+    #points result
+    #TODO: centralize the text
+    print(f"----------POINTS----------\n {player1['initials']}: {P1.ptsAvg} {comparison[0]['pts']} {P2.ptsAvg} :{player2['initials']}")
+    print(f"----------REBOUNDS----------\n {player1['initials']}: {P1.rebAvg} {comparison[0]['reb']} {P2.rebAvg} :{player2['initials']}")
+    print(f"----------ASSISTS----------\n {player1['initials']}: {P1.astAvg} {comparison[0]['ast']} {P2.astAvg} :{player2['initials']}")
+    print(f"----------BLOCKS----------\n {player1['initials']}: {P1.blkAvg} {comparison[0]['blk']} {P2.blkAvg} :{player2['initials']}")
+    print(f"----------STEALS----------\n {player1['initials']}: {P1.stlAvg} {comparison[0]['stl']} {P2.stlAvg} :{player2['initials']}")
+    print(f"----------TURNOVERS----------\n {player1['initials']}: {P1.tovAvg} {comparison[0]['tov']} {P2.tovAvg} :{player2['initials']}")
+
+    if comparison[1] > comparison[2]:
+        print(f"\nOVERALL WINNER: {P1.name}")
+    elif comparison[1] < comparison[2]:
+        print(f"\nOVERALL WINNER: {P2.name}")
+    else:
+        print("\nTIE")
