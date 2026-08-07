@@ -99,65 +99,32 @@ class player:
 
 
     def findPlayer(num):
-        wordCount = 1
-
         if num == 1:
-            message = "Input the first player's full name (first and last): "
+            prompt = "Input the first player's full name (first and last): "
         elif num == 2:
-            message = "Input the second player's full name (first and last): "
-            
-        name = input(message)
+            prompt = "Input the second player's full name (first and last): "
 
-        if name.strip().count(" ") + name.count("-") == 0:
-            name = input("Try Again: ")
-            while name.count(" ") + name.count("-") == 0:
-                name = input("Try Again: ")
 
-        elif name.strip().count(" ") + name.count("-") == 1: ## type 2
-            while True: 
-                if not name.strip().count(" ") + name.count("-") == 0:
-                    try:
-                        id = players.find_players_by_full_name(name)[0]['id']
-                        break
-                    except (NameError, IndexError):
-                        name = input("Try Again: ")
-                else:
-                    name = input("Try Again: ")
+        while True:
+            name = input(prompt).strip()
+            separator_count = name.count(" ") + name.count("-")
 
-            if name.strip().count(" ") + name.count("-") == 1:
-                wordCount = 2
-            elif name.strip().count(" ") + name.count("-") == 2:
-                wordCount = 3    
+            if not (1 <= separator_count <= 2):
+                prompt = "Try Again: "
+                continue
 
-        elif name.strip().count(" ") + name.count("-") == 2: ## type 3
-            while True: 
-                    if not name.strip().count(" ") + name.count("-") == 0:
-                        try:
-                            id = players.find_players_by_full_name(name)[0]['id'] #
-                            break
-                        except (NameError, IndexError):
-                            name = input("Try Again: ")
-                    else:
-                        name = input("Try Again: ")
+            try:
+                player_id = players.find_players_by_full_name(name)[0]["id"]
+                break
+            except (NameError, IndexError):
+                prompt = "Player not found. Try Again: "
 
-            if name.strip().count(" ") + name.count("-") == 1:
-                wordCount = 2
-            elif name.strip().count(" ") + name.count("-") == 2:
-                wordCount = 3    
-
-        else:
-            name = input("Try Again: ")
-            while name.strip().count(" ") + name.count("-") == 0:
-                name = input("Try Again: ")
-
-        id = players.find_players_by_full_name(name)[0]['id']
-
-        name = players.find_player_by_id(id)['full_name']
+        name = players.find_player_by_id(player_id)['full_name']
 
         #ensures the initials are correct for the player name inputted
-        if wordCount == 2:
+        if separator_count == 1:
             initials = name[0].capitalize() + name[name.find(" ") + 1].capitalize() 
-        elif wordCount == 3:
+        elif separator_count == 2:
             initials = name[0].capitalize() + name[name.find(" ") + 1].capitalize() + name[-name.find(" ") - 1].capitalize()
 
         return {'id': id, 'initials': initials, 'name': name}
