@@ -16,17 +16,13 @@ whitespace = " "
 print("NBA PLAYER COMPARISON (25-26 season)\n")
 
 
-#define players
+
 player1 = player.findPlayer(1)
-
 id1 = player1['id']
+filepath1 = fr"NBA\stats\{player1['initials']}_Stats.json" #these filepaths might not work on other computers
+seasonStats1 = playercareerstats.PlayerCareerStats(id1).get_data_frames()[0] #get the first dataframe of the list (which contains all career stats)
 
-filepath1 = fr"NBA\stats\{player1['initials']}_Stats.json"
-
-seasonStats1 = playercareerstats.PlayerCareerStats(id1).get_data_frames()[0]
-
-#save stats as json files
-try:
+try: #save stats as json files
     with open (filepath1, 'r') as stats1:
         pass #check for file
     filepath1 = fr"NBA\stats\{player1['initials']}_Stats1.json"
@@ -50,24 +46,19 @@ for i in seasonStats1.index:
 
 
 player2 = player.findPlayer(2)
-
 id2 = player2['id']
-
- #these paths might not always work
 filepath2 = fr"NBA\stats\{player2['initials']}_Stats.json"
-
-#get the first dataframe of the list (which contains all career stats)
 seasonStats2 = playercareerstats.PlayerCareerStats(id2).get_data_frames()[0]
 
 try:
     with open (filepath2, 'r') as stats2:
-        pass #check for file
+        pass 
     filepath2 = fr"NBA\stats\{player2['initials']}_Stats1.json"
     with open (filepath2, 'w') as stats2:
-        stats2.write(seasonStats2.to_json(orient='records', lines=True)) #if exists, write with another name
+        stats2.write(seasonStats2.to_json(orient='records', lines=True))
 except: #if doesn't exist
     with open (filepath2, 'w') as stats2:
-        stats2.write(seasonStats2.to_json(orient='records', lines=True)) #save it with default name
+        stats2.write(seasonStats2.to_json(orient='records', lines=True)) 
 
 for i in seasonStats2.index:
     if seasonStats2.loc[i, 'SEASON_ID'] == '2025-26':
@@ -92,8 +83,6 @@ else:
     print("2025-26 STATS")
     print(f"{player1['name']} vs. {player2['name']}: (Arrow points the category winner)")
 
-
-    #points result
     #TODO: centralize the text
     print(f"{(10 - len("POINTS"))*whitespace} POINTS {(10 - len("POINTS"))*whitespace} \n {player1['initials']}: {P1.ptsAvg} {comparison[0]['pts']} {P2.ptsAvg} :{player2['initials']}")
     print(f"{(10 - len("REBOUNDS"))*whitespace} REBOUNDS {(10 - len("REBOUNDS"))*whitespace} \n {player1['initials']}: {P1.rebAvg} {comparison[0]['reb']} {P2.rebAvg} :{player2['initials']}")
