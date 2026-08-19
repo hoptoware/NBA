@@ -1,3 +1,4 @@
+import sqlite3
 import numpy as np
 import pandas as pd
 
@@ -8,6 +9,15 @@ from nba_api.stats.endpoints import playercareerstats
 
 
 whitespace = " "
+
+datapath = fr"NBA\stats\playersStats.db"
+
+try:
+    with open (datapath, 'r') as stats:
+        pass #make sure database exists
+except:
+    with open (datapath, 'w') as stats:
+        pass
 
 
 ##########
@@ -23,20 +33,70 @@ filepath1 = fr"NBA\stats\{player1['initials']}_Stats.json" #these filepaths migh
 seasonStats1 = playercareerstats.PlayerCareerStats(id1).get_data_frames()[0] #get the first dataframe of the list (which contains all career stats)
 
 try:
-    with open (filepath1, 'r') as stats:
-        pass #check for file
-    for i in range(1, 9999):
-        try:
-            filepath1 = fr"NBA\stats\{player1['initials']}_Stats{i}.json"
-            with open (filepath1, 'r') as stats:
-                pass #check for file
-        except:
-            with open (filepath1, 'w') as stats:
-                stats.write(seasonStats1.to_json(orient='records', lines=True)) #if exists, write with another name
-            break #if file doesn't exist, break the loop and save it with that name      
-except: #if doesn't exist
-    with open (filepath1, 'w') as stats:
-        stats.write(seasonStats1.to_json(orient='records', lines=True)) #save it with default name
+    with sqlite3.connect(datapath) as connection:
+        cursor = connection.cursor()
+
+        selection_query = fr'''
+        SELECT * FROM {(player1['name'].replace(' ', '_')).replace('-', '_')};
+        '''
+
+        cursor.execute(selection_query)
+
+        
+        update_query = fr'''
+            UPDATE {(player1['name'].replace(' ', '_')).replace('-', '_')} 
+            SET ppg = ?,
+                rpg = ?,
+                apg = ?,
+                bpg = ?,
+                spg = ?,
+                tovpg = ?
+            WHERE season = ?;
+            '''
+
+        for i in seasonStats1.index:
+            values = (
+                    round(float(seasonStats1.loc[i, 'PTS'] / seasonStats1.loc[i, 'GP']), 1), 
+                    round(float(seasonStats1.loc[i, 'REB'] / seasonStats1.loc[i, 'GP']), 1), 
+                    round(float(seasonStats1.loc[i, 'AST'] / seasonStats1.loc[i, 'GP']), 1),
+                    round(float(seasonStats1.loc[i, 'BLK'] / seasonStats1.loc[i, 'GP']), 1),
+                    round(float(seasonStats1.loc[i, 'STL'] / seasonStats1.loc[i, 'GP']), 1),  
+                    round(float(seasonStats1.loc[i, 'TOV'] / seasonStats1.loc[i, 'GP']), 1),
+                    seasonStats1.loc[i, 'SEASON_ID'])
+            cursor.execute(update_query, values)
+except:
+        with sqlite3.connect(datapath) as connection:
+            cursor = connection.cursor()
+
+            cursor.execute(fr'''
+            CREATE TABLE IF NOT EXISTS {(player1['name'].replace(' ', '_')).replace('-', '_')} 
+            (season REAL,
+            ppg REAL,
+            rpg REAL,
+            apg REAL,
+            bpg REAL,
+            spg REAL,
+            tovpg REAL
+            );
+            ''')
+
+            insert_query = fr'''
+            INSERT INTO {(player1['name'].replace(' ', '_')).replace('-', '_')} (season, ppg, rpg, apg, bpg, spg, tovpg) 
+            VALUES (?, ?, ?, ?, ?, ?, ?);
+            '''
+
+            for i in seasonStats1.index:
+                values = (seasonStats1.loc[i, 'SEASON_ID'], 
+                        round(float(seasonStats1.loc[i, 'PTS'] / seasonStats1.loc[i, 'GP']), 1), 
+                        round(float(seasonStats1.loc[i, 'REB'] / seasonStats1.loc[i, 'GP']), 1), 
+                        round(float(seasonStats1.loc[i, 'AST'] / seasonStats1.loc[i, 'GP']), 1),
+                        round(float(seasonStats1.loc[i, 'BLK'] / seasonStats1.loc[i, 'GP']), 1),
+                        round(float(seasonStats1.loc[i, 'STL'] / seasonStats1.loc[i, 'GP']), 1),  
+                        round(float(seasonStats1.loc[i, 'TOV'] / seasonStats1.loc[i, 'GP']), 1))
+                cursor.execute(insert_query, values)
+
+            connection.commit()
+
 
 #check for season 2025-26 and print the stats for that season
 for i in seasonStats1.index:
@@ -57,20 +117,69 @@ filepath2 = fr"NBA\stats\{player2['initials']}_Stats.json"
 seasonStats2 = playercareerstats.PlayerCareerStats(id2).get_data_frames()[0]
 
 try:
-    with open (filepath2, 'r') as stats:
-        pass #check for file
-    for i in range(1, 9999):
-        try:
-            filepath2 = fr"NBA\stats\{player2['initials']}_Stats{i}.json"
-            with open (filepath2, 'r') as stats:
-                pass #check for file
-        except:
-            with open (filepath2, 'w') as stats:
-                stats.write(seasonStats2.to_json(orient='records', lines=True)) #if exists, write with another name
-            break #if file doesn't exist, break the loop and save it with that name      
-except: #if doesn't exist
-    with open (filepath2, 'w') as stats:
-        stats.write(seasonStats2.to_json(orient='records', lines=True)) #save it with default name
+    with sqlite3.connect(datapath) as connection:
+        cursor = connection.cursor()
+
+        selection_query = fr'''
+        SELECT * FROM {(player2['name'].replace(' ', '_')).replace('-', '_')};
+        '''
+
+        cursor.execute(selection_query)
+
+        
+        update_query = fr'''
+            UPDATE {(player2['name'].replace(' ', '_')).replace('-', '_')} 
+            SET ppg = ?,
+                rpg = ?,
+                apg = ?,
+                bpg = ?,
+                spg = ?,
+                tovpg = ?
+            WHERE season = ?;
+            '''
+
+        for i in seasonStats2.index:
+            values = (
+                    round(float(seasonStats2.loc[i, 'PTS'] / seasonStats2.loc[i, 'GP']), 1), 
+                    round(float(seasonStats2.loc[i, 'REB'] / seasonStats2.loc[i, 'GP']), 1), 
+                    round(float(seasonStats2.loc[i, 'AST'] / seasonStats2.loc[i, 'GP']), 1),
+                    round(float(seasonStats2.loc[i, 'BLK'] / seasonStats2.loc[i, 'GP']), 1),
+                    round(float(seasonStats2.loc[i, 'STL'] / seasonStats2.loc[i, 'GP']), 1),  
+                    round(float(seasonStats2.loc[i, 'TOV'] / seasonStats2.loc[i, 'GP']), 1),
+                    seasonStats2.loc[i, 'SEASON_ID'])
+            cursor.execute(update_query, values)
+except:
+        with sqlite3.connect(datapath) as connection:
+            cursor = connection.cursor()
+
+            cursor.execute(fr'''
+            CREATE TABLE IF NOT EXISTS {(player2['name'].replace(' ', '_')).replace('-', '_')} 
+            (season REAL,
+            ppg REAL,
+            rpg REAL,
+            apg REAL,
+            bpg REAL,
+            spg REAL,
+            tovpg REAL
+            );
+            ''')
+
+            insert_query = fr'''
+            INSERT INTO {(player2['name'].replace(' ', '_')).replace('-', '_')} (season, ppg, rpg, apg, bpg, spg, tovpg) 
+            VALUES (?, ?, ?, ?, ?, ?, ?);
+            '''
+
+            for i in seasonStats2.index:
+                values = (seasonStats2.loc[i, 'SEASON_ID'], 
+                        round(float(seasonStats2.loc[i, 'PTS'] / seasonStats2.loc[i, 'GP']), 1), 
+                        round(float(seasonStats2.loc[i, 'REB'] / seasonStats2.loc[i, 'GP']), 1), 
+                        round(float(seasonStats2.loc[i, 'AST'] / seasonStats2.loc[i, 'GP']), 1),
+                        round(float(seasonStats2.loc[i, 'BLK'] / seasonStats2.loc[i, 'GP']), 1),
+                        round(float(seasonStats2.loc[i, 'STL'] / seasonStats2.loc[i, 'GP']), 1),  
+                        round(float(seasonStats2.loc[i, 'TOV'] / seasonStats2.loc[i, 'GP']), 1))
+                cursor.execute(insert_query, values)
+
+            connection.commit()
 
 for i in seasonStats2.index:
     if seasonStats2.loc[i, 'SEASON_ID'] == '2025-26':
