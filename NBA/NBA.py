@@ -1,4 +1,6 @@
 import sqlite3
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
@@ -10,7 +12,8 @@ from nba_api.stats.endpoints import playercareerstats
 
 whitespace = " "
 
-datapath = fr"NBA\stats\playersStats.db"
+stats_dir = Path(__file__).resolve().parent / "stats"
+datapath = stats_dir / "playersStats.db"
 
 try:
     with open (datapath, 'r') as stats:
@@ -29,7 +32,7 @@ print("NBA PLAYER COMPARISON (25-26 season)\n")
 
 player1 = player.findPlayer(1)
 id1 = player1['id']
-filepath1 = fr"NBA\stats\{player1['initials']}_Stats.json" #these filepaths might not work on other computers
+filepath1 = stats_dir / f"{player1['initials']}_Stats.json"
 seasonStats1 = playercareerstats.PlayerCareerStats(id1).get_data_frames()[0] #get the first dataframe of the list (which contains all career stats)
 
 try:
@@ -113,7 +116,7 @@ for i in seasonStats1.index:
 
 player2 = player.findPlayer(2)
 id2 = player2['id']
-filepath2 = fr"NBA\stats\{player2['initials']}_Stats.json"
+filepath2 = stats_dir / f"{player2['initials']}_Stats.json"
 seasonStats2 = playercareerstats.PlayerCareerStats(id2).get_data_frames()[0]
 
 try:
