@@ -12,8 +12,11 @@ from nba_api.stats.endpoints import playercareerstats
 
 whitespace = " "
 
-stats_dir = Path(__file__).resolve().parent / "stats"
-datapath = stats_dir / "playersStats.db"
+try:
+    stats_dir = Path(__file__).resolve().parent / "stats"
+    datapath = stats_dir / "playersStats.db"
+except:
+    print("An unexpected error has ocurred. The data cannot be saved.")
 
 try:
     with open (datapath, 'r') as stats:
