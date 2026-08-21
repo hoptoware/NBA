@@ -14,13 +14,6 @@ whitespace = " "
 
 datapath = Path(__file__).resolve().parent / "stats" / "playersStats.db"
 
-try:
-    with open (datapath, 'r') as stats:
-        pass #make sure database exists
-except:
-    with open (datapath, 'w') as stats:
-        pass
-
 
 ##########
 
