@@ -1,7 +1,6 @@
 import sqlite3
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 from functions import player
@@ -22,7 +21,7 @@ print("NBA PLAYER COMPARISON (25-26 season)\n")
 
 
 player1 = player.findPlayer(1)
-filename1 = (player1['name'].replace(' ', '_')).replace('-', '_')
+filename1 = (player1['name'].replace(' ', '_')).replace('-', '_').replace('.', '')
 id1 = player1['id']
 seasonStats1 = playercareerstats.PlayerCareerStats(id1).get_data_frames()[0] #get the first dataframe of the list (which contains all career stats)
 
@@ -72,7 +71,7 @@ except:
             spg REAL,
             tovpg REAL
             );
-            ''')
+            ''') #TODO: add team column to avoid duplicates and remove the TOT rows from duplicate seasons 
 
             insert_query = fr'''
             INSERT INTO {filename1} (season, ppg, rpg, apg, bpg, spg, tovpg) 
