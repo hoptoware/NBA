@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import re
 
@@ -107,7 +106,9 @@ class player:
 
 
         while True:
-            name = input(prompt).strip()
+            name = input(prompt).strip().replace('.', '')
+            name = ' '.join(name.split())
+            name = ' '.join(name.split(sep = '-'))
             separator_count = name.count(" ") + name.count("-")
 
             if not (1 <= separator_count <= 2):
@@ -115,7 +116,7 @@ class player:
                 continue
 
             try:
-                player_id = players.find_players_by_full_name(name)[0]["id"]
+                player_id = players.find_players_by_full_name(name)[0]["id"] 
                 break
             except (NameError, IndexError):
                 prompt = "Player not found. Try Again: "
