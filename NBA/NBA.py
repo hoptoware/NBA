@@ -38,7 +38,8 @@ try:
         
         update_query = fr'''
             UPDATE {filename1} 
-            SET ppg = ?,
+            SET team = ?
+                ppg = ?,
                 rpg = ?,
                 apg = ?,
                 bpg = ?,
@@ -48,7 +49,7 @@ try:
             '''
 
         for i in seasonStats1.index:
-            values = (
+            values = (seasonStats1.loc[i, 'TEAM_ABBREVIATION'],
                     round(float(seasonStats1.loc[i, 'PTS'] / seasonStats1.loc[i, 'GP']), 1), 
                     round(float(seasonStats1.loc[i, 'REB'] / seasonStats1.loc[i, 'GP']), 1), 
                     round(float(seasonStats1.loc[i, 'AST'] / seasonStats1.loc[i, 'GP']), 1),
@@ -64,6 +65,7 @@ except:
             cursor.execute(fr'''
             CREATE TABLE IF NOT EXISTS {filename1} 
             (season REAL,
+            team REAL,
             ppg REAL,
             rpg REAL,
             apg REAL,
@@ -71,15 +73,15 @@ except:
             spg REAL,
             tovpg REAL
             );
-            ''') #TODO: add team column to avoid duplicates and remove the TOT rows from duplicate seasons 
+            ''') #TODO: add code that checks and removes duplicate rows
 
             insert_query = fr'''
-            INSERT INTO {filename1} (season, ppg, rpg, apg, bpg, spg, tovpg) 
-            VALUES (?, ?, ?, ?, ?, ?, ?);
+            INSERT INTO {filename1} (season, team, ppg, rpg, apg, bpg, spg, tovpg) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
             '''
 
             for i in seasonStats1.index:
-                values = (seasonStats1.loc[i, 'SEASON_ID'], 
+                values = (seasonStats1.loc[i, 'SEASON_ID'], seasonStats1.loc[i, 'TEAM_ABBREVIATION'],
                         round(float(seasonStats1.loc[i, 'PTS'] / seasonStats1.loc[i, 'GP']), 1), 
                         round(float(seasonStats1.loc[i, 'REB'] / seasonStats1.loc[i, 'GP']), 1), 
                         round(float(seasonStats1.loc[i, 'AST'] / seasonStats1.loc[i, 'GP']), 1),
@@ -122,7 +124,8 @@ try:
         
         update_query = fr'''
             UPDATE {filename2} 
-            SET ppg = ?,
+            SET team = ?,
+                ppg = ?,
                 rpg = ?,
                 apg = ?,
                 bpg = ?,
@@ -133,6 +136,7 @@ try:
 
         for i in seasonStats2.index:
             values = (
+                    seasonStats2.loc[i, 'TEAM_ABBREVIATION'],
                     round(float(seasonStats2.loc[i, 'PTS'] / seasonStats2.loc[i, 'GP']), 1), 
                     round(float(seasonStats2.loc[i, 'REB'] / seasonStats2.loc[i, 'GP']), 1), 
                     round(float(seasonStats2.loc[i, 'AST'] / seasonStats2.loc[i, 'GP']), 1),
@@ -148,6 +152,7 @@ except:
             cursor.execute(fr'''
             CREATE TABLE IF NOT EXISTS {filename2} 
             (season REAL,
+            team REAL,
             ppg REAL,
             rpg REAL,
             apg REAL,
@@ -158,8 +163,8 @@ except:
             ''')
 
             insert_query = fr'''
-            INSERT INTO {filename2} (season, ppg, rpg, apg, bpg, spg, tovpg) 
-            VALUES (?, ?, ?, ?, ?, ?, ?);
+            INSERT INTO {filename2} (season, team, ppg, rpg, apg, bpg, spg, tovpg) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
             '''
 
             for i in seasonStats2.index:
