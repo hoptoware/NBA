@@ -1,5 +1,6 @@
 import sqlite3
-import numpy as np
+from pathlib import Path
+
 import pandas as pd
 
 from functions import player
@@ -10,14 +11,7 @@ from nba_api.stats.endpoints import playercareerstats
 
 whitespace = " "
 
-datapath = fr"NBA\stats\playersStats.db"
-
-try:
-    with open (datapath, 'r') as stats:
-        pass #make sure database exists
-except:
-    with open (datapath, 'w') as stats:
-        pass
+datapath = Path(__file__).resolve().parent / "stats" / "playersStats.db"
 
 
 ##########
@@ -26,10 +20,9 @@ except:
 print("NBA PLAYER COMPARISON (25-26 season)\n")
 
 
-
 player1 = player.findPlayer(1)
+filename1 = (player1['name'].replace(' ', '_')).replace('-', '_').replace('.', '')
 id1 = player1['id']
-filepath1 = fr"NBA\stats\{player1['initials']}_Stats.json" #these filepaths might not work on other computers
 seasonStats1 = playercareerstats.PlayerCareerStats(id1).get_data_frames()[0] #get the first dataframe of the list (which contains all career stats)
 
 try:
@@ -37,15 +30,16 @@ try:
         cursor = connection.cursor()
 
         selection_query = fr'''
-        SELECT * FROM {(player1['name'].replace(' ', '_')).replace('-', '_')};
+        SELECT * FROM {filename1};
         '''
 
         cursor.execute(selection_query)
 
         
         update_query = fr'''
-            UPDATE {(player1['name'].replace(' ', '_')).replace('-', '_')} 
-            SET ppg = ?,
+            UPDATE {filename1} 
+            SET team = ?
+                ppg = ?,
                 rpg = ?,
                 apg = ?,
                 bpg = ?,
@@ -55,7 +49,7 @@ try:
             '''
 
         for i in seasonStats1.index:
-            values = (
+            values = (seasonStats1.loc[i, 'TEAM_ABBREVIATION'],
                     round(float(seasonStats1.loc[i, 'PTS'] / seasonStats1.loc[i, 'GP']), 1), 
                     round(float(seasonStats1.loc[i, 'REB'] / seasonStats1.loc[i, 'GP']), 1), 
                     round(float(seasonStats1.loc[i, 'AST'] / seasonStats1.loc[i, 'GP']), 1),
@@ -69,8 +63,9 @@ except:
             cursor = connection.cursor()
 
             cursor.execute(fr'''
-            CREATE TABLE IF NOT EXISTS {(player1['name'].replace(' ', '_')).replace('-', '_')} 
+            CREATE TABLE IF NOT EXISTS {filename1} 
             (season REAL,
+            team REAL,
             ppg REAL,
             rpg REAL,
             apg REAL,
@@ -78,15 +73,15 @@ except:
             spg REAL,
             tovpg REAL
             );
-            ''')
+            ''') #TODO: add code that checks and removes duplicate rows
 
             insert_query = fr'''
-            INSERT INTO {(player1['name'].replace(' ', '_')).replace('-', '_')} (season, ppg, rpg, apg, bpg, spg, tovpg) 
-            VALUES (?, ?, ?, ?, ?, ?, ?);
+            INSERT INTO {filename1} (season, team, ppg, rpg, apg, bpg, spg, tovpg) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
             '''
 
             for i in seasonStats1.index:
-                values = (seasonStats1.loc[i, 'SEASON_ID'], 
+                values = (seasonStats1.loc[i, 'SEASON_ID'], seasonStats1.loc[i, 'TEAM_ABBREVIATION'],
                         round(float(seasonStats1.loc[i, 'PTS'] / seasonStats1.loc[i, 'GP']), 1), 
                         round(float(seasonStats1.loc[i, 'REB'] / seasonStats1.loc[i, 'GP']), 1), 
                         round(float(seasonStats1.loc[i, 'AST'] / seasonStats1.loc[i, 'GP']), 1),
@@ -112,8 +107,8 @@ for i in seasonStats1.index:
 
 
 player2 = player.findPlayer(2)
+filename2 = (player2['name'].replace(' ', '_')).replace('-', '_')
 id2 = player2['id']
-filepath2 = fr"NBA\stats\{player2['initials']}_Stats.json"
 seasonStats2 = playercareerstats.PlayerCareerStats(id2).get_data_frames()[0]
 
 try:
@@ -121,15 +116,16 @@ try:
         cursor = connection.cursor()
 
         selection_query = fr'''
-        SELECT * FROM {(player2['name'].replace(' ', '_')).replace('-', '_')};
+        SELECT * FROM {filename2};
         '''
 
         cursor.execute(selection_query)
 
         
         update_query = fr'''
-            UPDATE {(player2['name'].replace(' ', '_')).replace('-', '_')} 
-            SET ppg = ?,
+            UPDATE {filename2} 
+            SET team = ?,
+                ppg = ?,
                 rpg = ?,
                 apg = ?,
                 bpg = ?,
@@ -140,6 +136,7 @@ try:
 
         for i in seasonStats2.index:
             values = (
+                    seasonStats2.loc[i, 'TEAM_ABBREVIATION'],
                     round(float(seasonStats2.loc[i, 'PTS'] / seasonStats2.loc[i, 'GP']), 1), 
                     round(float(seasonStats2.loc[i, 'REB'] / seasonStats2.loc[i, 'GP']), 1), 
                     round(float(seasonStats2.loc[i, 'AST'] / seasonStats2.loc[i, 'GP']), 1),
@@ -153,8 +150,9 @@ except:
             cursor = connection.cursor()
 
             cursor.execute(fr'''
-            CREATE TABLE IF NOT EXISTS {(player2['name'].replace(' ', '_')).replace('-', '_')} 
+            CREATE TABLE IF NOT EXISTS {filename2} 
             (season REAL,
+            team REAL,
             ppg REAL,
             rpg REAL,
             apg REAL,
@@ -165,8 +163,8 @@ except:
             ''')
 
             insert_query = fr'''
-            INSERT INTO {(player2['name'].replace(' ', '_')).replace('-', '_')} (season, ppg, rpg, apg, bpg, spg, tovpg) 
-            VALUES (?, ?, ?, ?, ?, ?, ?);
+            INSERT INTO {filename2} (season, team, ppg, rpg, apg, bpg, spg, tovpg) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
             '''
 
             for i in seasonStats2.index:

@@ -1,5 +1,5 @@
-import numpy as np
 import pandas as pd
+import re
 
 from nba_api.stats.static import players, teams
 from nba_api.stats.endpoints import playercareerstats, playercompare
@@ -106,7 +106,9 @@ class player:
 
 
         while True:
-            name = input(prompt).strip()
+            name = input(prompt).strip().replace('.', '')
+            name = ' '.join(name.split())
+            name = ' '.join(name.split(sep = '-'))
             separator_count = name.count(" ") + name.count("-")
 
             if not (1 <= separator_count <= 2):
@@ -114,17 +116,13 @@ class player:
                 continue
 
             try:
-                player_id = players.find_players_by_full_name(name)[0]["id"]
+                player_id = players.find_players_by_full_name(name)[0]["id"] 
                 break
             except (NameError, IndexError):
                 prompt = "Player not found. Try Again: "
 
         name = players.find_player_by_id(player_id)['full_name']
 
-        #ensures the initials are correct for the player name inputted
-        if separator_count == 1:
-            initials = name[0].capitalize() + name[name.find(" ") + 1].capitalize() 
-        elif separator_count == 2:
-            initials = name[0].capitalize() + name[name.find(" ") + 1].capitalize() + name[-name.find(" ") - 1].capitalize()
+        initials = ''.join(re.findall(r'(?:^|[ -])([A-Za-z])', name)).upper()
 
-        return {'id': id, 'initials': initials, 'name': name}
+        return {'id': player_id, 'initials': initials, 'name': name}
