@@ -1,5 +1,9 @@
-import numpy as np
+import sqlite3
+
 import pandas as pd
+import re
+
+from pathlib import Path
 
 from nba_api.stats.static import players, teams
 from nba_api.stats.endpoints import playercareerstats, playercompare
@@ -30,7 +34,7 @@ class player:
         self.tovAvg = round(self.tov / self.gp, 1) if self.gp else None
 
 
-    def compare(p1, p2): #arguments must be of the class 'player'
+    def compare(p1: player, p2: player): #arguments must be of the class 'player'
         p1.win = 0
         p2.win = 0
         checkDict = {'pts': '??', 'reb': '??', 'ast': '??', 'blk': '??', 'stl': '??', 'tov': '??'}
@@ -106,7 +110,9 @@ class player:
 
 
         while True:
-            name = input(prompt).strip()
+            name = input(prompt).strip().replace('.', '')
+            name = ' '.join(name.split())
+            name = ' '.join(name.split(sep = '-'))
             separator_count = name.count(" ") + name.count("-")
 
             if not (1 <= separator_count <= 2):
@@ -114,17 +120,53 @@ class player:
                 continue
 
             try:
-                player_id = players.find_players_by_full_name(name)[0]["id"]
+                player_id = players.find_players_by_full_name(name)[0]["id"] #TODO: stop inputs like " .... ...." from working
                 break
             except (NameError, IndexError):
                 prompt = "Player not found. Try Again: "
 
         name = players.find_player_by_id(player_id)['full_name']
 
-        #ensures the initials are correct for the player name inputted
-        if separator_count == 1:
-            initials = name[0].capitalize() + name[name.find(" ") + 1].capitalize() 
-        elif separator_count == 2:
-            initials = name[0].capitalize() + name[name.find(" ") + 1].capitalize() + name[-name.find(" ") - 1].capitalize()
+        initials = ''.join(re.findall(r'(?:^|[ -])([A-Za-z])', name)).upper()
 
-        return {'id': id, 'initials': initials, 'name': name}
+        return {'id': player_id, 'initials': initials, 'name': name}
+
+
+    def cleanData(playerData: player):
+        datapath = Path(__file__).resolve().parent / "stats" / "playersStats.db"
+        filename = playerData['name'].replace(' ', '_').replace('-', '_')
+
+        
+        with sqlite3.connect(datapath) as connection:
+            cursor = connection.cursor()
+
+            duplicates_found = True
+            
+            while duplicates_found:
+                duplicates_found = False
+
+                selection_query = fr'''
+                SELECT * FROM {filename};
+                '''
+                cursor.execute(selection_query)
+
+                rows = cursor.fetchall()
+
+                duplicate_season = None
+
+                for row in range(1, len(rows)):
+                    lastRow = rows[row - 1]
+
+                    if rows[row][0] == lastRow[0]:
+                        duplicate_season = rows[row][0]
+                        duplicates_found = True
+                        break
+
+                if duplicate_season is not None:
+                    delete_query = fr'''
+                    DELETE FROM {filename}
+                    WHERE season = ? AND team <> 'TOT';
+                    '''
+                    cursor.execute(delete_query, (duplicate_season,))
+                
+                connection.commit() 
