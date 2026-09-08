@@ -34,7 +34,7 @@ class player:
         self.tovAvg = round(self.tov / self.gp, 1) if self.gp else None
 
 
-    def compare(p1: player, p2: player): #arguments must be of the class 'player'
+    def compare(p1, p2): #arguments must be of the class 'player'
         p1.win = 0
         p2.win = 0
         checkDict = {'pts': '??', 'reb': '??', 'ast': '??', 'blk': '??', 'stl': '??', 'tov': '??'}
@@ -120,7 +120,7 @@ class player:
                 continue
 
             try:
-                player_id = players.find_players_by_full_name(name)[0]["id"] #TODO: stop inputs like " .... ...." from working
+                player_id = players.find_players_by_full_name(name)[0]["id"] 
                 break
             except (NameError, IndexError):
                 prompt = "Player not found. Try Again: "
@@ -136,7 +136,6 @@ class player:
         datapath = Path(__file__).resolve().parent / "stats" / "playersStats.db"
         filename = playerData['name'].replace(' ', '_').replace('-', '_')
 
-        
         with sqlite3.connect(datapath) as connection:
             cursor = connection.cursor()
 
@@ -152,21 +151,34 @@ class player:
 
                 rows = cursor.fetchall()
 
-                duplicate_season = None
+                duplicateIndex = None
+                duplicateCounter = 0
 
-                for row in range(1, len(rows)):
-                    lastRow = rows[row - 1]
+                for i in range(1, len(rows)):
+                    lastRow = rows[i - 1] #compare current row to the one before it
 
-                    if rows[row][0] == lastRow[0]:
-                        duplicate_season = rows[row][0]
+                    if rows[i][0] == lastRow[0]:
+                        duplicateIndex = i - 1 #index in which this duplicate group starts at
                         duplicates_found = True
                         break
+                    else:
+                        pass        
 
-                if duplicate_season is not None:
-                    delete_query = fr'''
-                    DELETE FROM {filename}
-                    WHERE season = ? AND team <> 'TOT';
-                    '''
-                    cursor.execute(delete_query, (duplicate_season,))
+                if duplicateIndex is not None: 
+                    for i in range(duplicateIndex, len(rows)): #from the duplicate row up until the last row
+                        if rows[i][0] == rows[duplicateIndex][0]: #check if their seasons are equal
+                            duplicateCounter += 1 #add to the counter
+                        else:
+                            break
+
+                    for i in range(duplicateIndex, duplicateIndex + duplicateCounter - 1):
+                        if not rows[i][1] == 'TOT': #check if the row doen't represent the total
+                            delete_query = fr'''
+                            DELETE FROM {filename}
+                            WHERE season = ? AND team <> 'TOT';
+                            '''
+                            cursor.execute(delete_query, (rows[i][0],))
+                        else:
+                            break
                 
-                connection.commit() 
+                connection.commit()  # Commit changes after each deletion pass
