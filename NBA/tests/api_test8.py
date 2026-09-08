@@ -17,7 +17,6 @@ with sqlite3.connect(datapath) as connection:
     
     while duplicates_found:
         duplicates_found = False
-        breakLoop = False
 
         selection_query = fr'''
         SELECT * FROM Zaid_Abdul_Aziz;
@@ -26,22 +25,36 @@ with sqlite3.connect(datapath) as connection:
 
         rows = cursor.fetchall()
 
-        duplicate_season = None
+        duplicateIndex = None
+        duplicateCounter = 0
 
-        for row in range(1, len(rows)):
-            lastRow = rows[row - 1]
+        for i in range(1, len(rows)):
+            lastRow = rows[i - 1] #compare current row to the one before it
 
-            if rows[row][0] == lastRow[0]:
-                duplicate_season = rows[row][0]
-                print(f"Duplicate found for season: {duplicate_season}")
+            if rows[i][0] == lastRow[0]:
+                duplicateIndex = i - 1 #index in which this duplicate group starts at
+                print(f"Duplicate found at index: {duplicateIndex}")
                 duplicates_found = True
                 break
+            else:
+                pass        
 
-        if duplicate_season is not None:
-            delete_query = fr'''
-            DELETE FROM Zaid_Abdul_Aziz
-            WHERE season = ? AND team <> 'TOT';
-            '''
-            cursor.execute(delete_query, (duplicate_season,))
+        if duplicateIndex is not None: 
+            for i in range(duplicateIndex, len(rows)): #from the duplicate row up until the last row
+                if rows[i][0] == rows[duplicateIndex][0]: #check if their seasons are equal
+                    duplicateCounter += 1 #add to the counter
+                    print(rows[i])
+                else:
+                    break
+
+            for i in range(duplicateIndex, duplicateIndex + duplicateCounter - 1):
+                if not rows[i][1] == 'TOT': #check if the row doen't represent the total
+                    delete_query = fr'''
+                    DELETE FROM Zaid_Abdul_Aziz
+                    WHERE season = ? AND team <> 'TOT';
+                    '''
+                    cursor.execute(delete_query, (rows[i][0],))
+                else:
+                    break
         
         connection.commit()  # Commit changes after each deletion pass
